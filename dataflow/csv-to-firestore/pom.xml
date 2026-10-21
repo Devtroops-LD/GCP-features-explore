@@ -76,11 +76,11 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Beam PipelineOptionsFactory needs hamcrest on the runtime classpath -->
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest</artifactId>
       <version>${hamcrest.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
