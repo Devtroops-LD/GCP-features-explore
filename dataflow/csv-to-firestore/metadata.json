@@ -1,0 +1,36 @@
+{
+  "name": "CSV to Firestore",
+  "description": "Reads a CSV file from Cloud Storage and upserts each row as a document in a Firestore collection.",
+  "parameters": [
+    {
+      "name": "input",
+      "label": "Input CSV file",
+      "helpText": "Cloud Storage path of the CSV file with a header row, e.g. gs://my-bucket/input/employees.csv",
+      "regexes": ["^gs:\\/\\/[^\\n\\r]+\\.csv$"]
+    },
+    {
+      "name": "collection",
+      "label": "Firestore collection",
+      "helpText": "Name of the Firestore collection to write documents into, e.g. employees",
+      "regexes": ["^[^/]+$"]
+    },
+    {
+      "name": "keyField",
+      "label": "Document ID column",
+      "helpText": "CSV column whose value becomes the Firestore document ID. Defaults to id.",
+      "isOptional": true
+    },
+    {
+      "name": "firestoreProject",
+      "label": "Firestore project",
+      "helpText": "Project that hosts Firestore. Defaults to the Dataflow job project.",
+      "isOptional": true
+    },
+    {
+      "name": "firestoreDb",
+      "label": "Firestore database",
+      "helpText": "Firestore database ID. Defaults to (default).",
+      "isOptional": true
+    }
+  ]
+}

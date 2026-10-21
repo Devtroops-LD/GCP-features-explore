@@ -1,0 +1,21 @@
+id,name,department,salary,joined_on
+E001,Aarav Sharma,Engineering,95000,2021-03-15
+E002,Diya Patel,Marketing,72000,2020-07-01
+E003,Vihaan Reddy,Engineering,105000,2019-11-20
+E004,Ananya Iyer,Finance,88000,2022-01-10
+E005,Arjun Nair,Sales,67000,2023-05-05
+E006,Saanvi Gupta,HR,61000,2021-09-13
+E007,Reyansh Kumar,Engineering,99000,2020-02-28
+E008,Ishita Menon,Product,110000,2018-06-18
+E009,Kabir Singh,Sales,70500,2022-08-22
+E010,Myra Joshi,Marketing,74000,2021-12-01
+E011,Aditya Rao,Engineering,120000,2017-04-03
+E012,Kiara Das,Finance,83000,2023-02-14
+E013,Vivaan Mehta,Product,101000,2020-10-30
+E014,Anika Bose,HR,59000,2024-01-08
+E015,Rohan Verma,Engineering,93000,2022-06-27
+E016,Tara Kulkarni,Sales,68000,2021-03-09
+E017,Dhruv Chatterjee,Engineering,97000,2019-08-16
+E018,Meera Pillai,Marketing,76000,2023-11-11
+E019,Krishna Yadav,Finance,90500,2018-12-24
+E020,Nisha Agarwal,Product,104000,2020-05-19
