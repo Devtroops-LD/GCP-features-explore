@@ -6,7 +6,7 @@ Apache Beam (Java 17, Beam 2.60.0) pipeline that reads a CSV file from Cloud Sto
 - The `keyField` column (default `id`) becomes the Firestore document ID, so re-running the job overwrites documents instead of duplicating them.
 - Writes go through Beam's `FirestoreIO.v1().write().batchWrite()`, which batches, retries and throttles requests.
 
-Build and deployment (Cloud Build, Artifact Registry, Flex Template) live in the [gcp-cicd](https://github.com/Devtroops-LD/gcp-cicd) repo under `dataflow/csv-to-firestore/`.
+CI in this repo ([`.github/workflows/csv-to-firestore-ci.yml`](../../.github/workflows/csv-to-firestore-ci.yml)) builds and tests on every pull request and push. After a green build on `main` it triggers the deploy workflow in [gcp-cicd](https://github.com/Devtroops-LD/gcp-cicd), which owns all GCP setup, IAM and deployment.
 
 ## Layout
 
@@ -49,7 +49,7 @@ java -jar target/csv-to-firestore-bundled.jar \
 
 ## Run on Dataflow manually
 
-Once the gcp-cicd build has published the template:
+Once the gcp-cicd workflow has published the template (normally you just tick **run_job** on that workflow instead):
 
 ```bash
 PROJECT_ID=devtroops-ld
@@ -60,7 +60,7 @@ gcloud dataflow flex-template run "csv-to-firestore-$(date +%Y%m%d-%H%M%S)" \
   --project=${PROJECT_ID} \
   --region=${REGION} \
   --template-file-gcs-location=${BUCKET}/templates/csv-to-firestore.json \
-  --service-account-email=dataflow-worker@${PROJECT_ID}.iam.gserviceaccount.com \
+  --service-account-email=csv-to-firestore-worker@${PROJECT_ID}.iam.gserviceaccount.com \
   --temp-location=${BUCKET}/temp \
   --staging-location=${BUCKET}/staging \
   --max-workers=1 \

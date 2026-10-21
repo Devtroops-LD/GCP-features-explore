@@ -1,0 +1,70 @@
+name: csv-to-firestore CI
+
+# Builds and tests the pipeline. After a green build on main it asks gcp-cicd to deploy this commit.
+on:
+  pull_request:
+    paths:
+      - dataflow/csv-to-firestore/**
+      - .github/workflows/csv-to-firestore-ci.yml
+  push:
+    branches: [main]
+    paths:
+      - dataflow/csv-to-firestore/**
+      - .github/workflows/csv-to-firestore-ci.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: csv-to-firestore-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dataflow/csv-to-firestore
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: dataflow/csv-to-firestore/pom.xml
+
+      - name: Test and package
+        run: mvn -B -ntp package
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: dataflow/csv-to-firestore/target/surefire-reports
+          retention-days: 7
+
+  trigger-deploy:
+    name: Trigger deployment in gcp-cicd
+    needs: build-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send repository_dispatch
+        env:
+          # Fine-grained PAT with Contents: read and write on the gcp-cicd repo.
+          GH_TOKEN: ${{ secrets.CICD_DISPATCH_TOKEN }}
+          CICD_REPO: ${{ vars.CICD_REPO || 'Devtroops-LD/gcp-cicd' }}
+        run: |
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "::warning::CICD_DISPATCH_TOKEN is not set; skipping automatic deployment. Run the gcp-cicd workflow manually."
+            exit 0
+          fi
+          gh api "repos/${CICD_REPO}/dispatches" \
+            -f event_type=csv-to-firestore-source-updated \
+            -f "client_payload[ref]=${GITHUB_SHA}"
+          echo "Requested deployment of ${GITHUB_SHA} in ${CICD_REPO}" >> "$GITHUB_STEP_SUMMARY"
