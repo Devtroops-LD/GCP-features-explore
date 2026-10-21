@@ -7,7 +7,9 @@ import java.nio.channels.Channels;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.beam.runners.dataflow.options.DataflowPipelineOptions;
 import org.apache.beam.sdk.Pipeline;
+import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.extensions.gcp.options.GcpOptions;
 import org.apache.beam.sdk.io.FileSystems;
 import org.apache.beam.sdk.io.TextIO;
@@ -79,7 +81,13 @@ public class CsvToFirestore {
             new CsvLinesToFirestoreWrites(
                 project, database, options.getCollection(), columns, options.getKeyField()))
         .apply("WriteFirestore", FirestoreIO.v1().write().batchWrite().build());
-    pipeline.run().waitUntilFinish();
+
+    PipelineResult result = pipeline.run();
+    // Flex Template launch sets --templateLocation; waitUntilFinish() then throws
+    // UnsupportedOperationException: "The result of template creation should not be used."
+    if (options.as(DataflowPipelineOptions.class).getTemplateLocation() == null) {
+      result.waitUntilFinish();
+    }
   }
 
   static List<String> readHeader(String input) throws IOException {
